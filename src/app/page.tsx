@@ -115,7 +115,7 @@ export default function MainPage() {
         
         {/* Scrollable Detailed Pages */}
         <div className="relative">
-          {sections.map((section, index) => (
+          {sections.map((section) => (
             <section 
               key={section.id} 
               id={section.id}
