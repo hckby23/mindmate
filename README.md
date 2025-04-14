@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MindMate - Mental Wellness Platform for Students
+
+MindMate is a mental wellness platform tailored for college students, providing stigma-free support and resources. This application is built with Next.js, Tailwind CSS (via ShadCN UI), and Supabase for backend services.
+
+## Features
+
+- **Chat Interface**: AI-powered chat for mental wellness support using OpenRouter API
+- **Anonymous Mode**: Toggle between regular and anonymous chat sessions
+- **User Authentication**: Optional login via Supabase Auth (Google, Email)
+- **Professional Help**: Directory of verified psychiatrists in Dehradun
+- **Modern UI**: Dark theme with cool blue primary color and purple hover effects
+
+## Tech Stack
+
+- **Frontend**: Next.js 15.3.0 + Tailwind CSS 4 (via ShadCN UI)
+- **Backend**: Supabase (Auth + Database)
+- **Hosting**: Vercel
+- **LLM API**: OpenRouter API
+- **UI Design**: Dark theme with cool blue primary (hover = purple)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js 20.x or higher
+- npm or yarn
+- Supabase account
+- OpenRouter API key
+
+### Environment Setup
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+OPENROUTER_API_KEY=your_openrouter_api_key
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+npm install
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Run the development server
+npm run dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the application.
 
-To learn more about Next.js, take a look at the following resources:
+## Database Schema
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The application uses the following Supabase tables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **users**: User authentication data
+- **chats**: Chat sessions with anonymity flag
+- **messages**: Individual messages within chats
+- **psychiatrists**: Professional help directory
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This application is configured for deployment on Vercel:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Set the environment variables in Vercel:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `OPENROUTER_API_KEY`
+
+## Design Notes
+
+- Optimized for laptop resolution (1024px+)
+- No mobile responsiveness required
+- Dark theme with cool blue primary color
+- Purple accents for hover states and anonymous mode
