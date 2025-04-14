@@ -5,9 +5,11 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import ChatMessage from '@/components/ChatMessage';
-import { Ghost, Send } from 'lucide-react';
+import { Ghost, Send, Menu } from 'lucide-react';
 import { supabase, Message } from '@/lib/supabase';
 import { sendMessageToOpenRouter, ChatMessage as OpenRouterMessage } from '@/lib/openrouter';
+import { useSidebar } from '@/lib/sidebar-context';
+import { generateUUID } from '@/lib/utils';
 
 
 
@@ -42,6 +44,7 @@ function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { toggleSidebar } = useSidebar();
   
   // Load an existing chat from Supabase
   const loadExistingChat = useCallback(async (chatId: string) => {
@@ -116,12 +119,12 @@ function ChatPage() {
   // Handle initial message from URL
   const handleInitialMessage = useCallback(async (initialMessage: string) => {
     // Create a new chat
-    const newChatId = crypto.randomUUID();
+    const newChatId = generateUUID();
     setChatId(newChatId);
 
     // Add user message
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       chat_id: newChatId,
       role: 'user',
       content: initialMessage,
@@ -141,7 +144,7 @@ function ChatPage() {
       const aiResponse = await sendMessageToOpenRouter(openRouterMessages);
 
       const aiMessage: Message = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         chat_id: newChatId,
         role: 'ai',
         content: aiResponse,
@@ -199,14 +202,14 @@ function ChatPage() {
 
     // Create a new chat if none exists
     if (!chatId) {
-      setChatId(crypto.randomUUID());
+      setChatId(generateUUID());
     }
 
     const userContent = inputValue.trim();
 
     // Add user message
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       chat_id: chatId || '',
       role: 'user',
       content: userContent,
@@ -232,7 +235,7 @@ function ChatPage() {
       const aiResponse = await sendMessageToOpenRouter(openRouterMessages);
 
       const aiMessage: Message = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         chat_id: chatId || '',
         role: 'ai',
         content: aiResponse,
@@ -347,15 +350,24 @@ function ChatPage() {
     <div className={`min-h-screen flex flex-col dark ${isAnonymous ? 'anonymous-theme' : ''}`}>
       <Navbar />
       
-      <div className="flex-1 flex">
+      <div className="flex-1 flex relative overflow-hidden">
         {/* Sidebar */}
-        <Sidebar />
+        <div className="md:relative absolute z-30">
+          <Sidebar />
+        </div>
         
         {/* Chat Area */}
-        <div className="flex-1 flex flex-col h-[calc(100vh-4rem)]">
+        <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] w-full z-20">
           {/* Chat Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <h2 className="text-xl font-semibold">Chat</h2>
+          <div className="flex items-center justify-between p-2 sm:p-4 border-b border-border">
+            <button 
+              onClick={toggleSidebar}
+              className="flex items-center md:cursor-default text-lg sm:text-xl font-semibold hover:text-primary md:hover:text-foreground"
+              aria-label="Toggle sidebar"
+            >
+              <Menu className="h-5 w-5 mr-2 md:hidden" />
+              <span>Chat</span>
+            </button>
             <button 
               onClick={toggleAnonymous}
               className={`p-2 rounded-full ${isAnonymous ? 'bg-[var(--purple)]/10 text-[var(--purple)]' : 'bg-muted/30 text-foreground/70 hover:text-primary'}`}
@@ -366,7 +378,7 @@ function ChatPage() {
           </div>
           
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-2 sm:p-4 pb-4 mb-2">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-foreground/50">
                 <p className="text-lg mb-2">Start a new conversation</p>
@@ -392,20 +404,26 @@ function ChatPage() {
           </div>
           
           {/* Input Area */}
-          <div className="p-4 border-t border-border">
+          <div className="p-2 sm:p-4 border-t border-border sticky bottom-0 bg-background">
             <form onSubmit={handleSubmit} className="flex items-center gap-2">
               <input
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 p-3 rounded-lg bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 p-2 sm:p-3 rounded-lg bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
                 disabled={isLoading}
+                autoComplete="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                inputMode="text"
+                style={{ fontSize: '16px' }} /* Prevents iOS zoom */
               />
               <button 
                 type="submit" 
-                className={`p-3 rounded-lg ${isLoading || !inputValue.trim() ? 'bg-muted/50 text-foreground/30' : 'bg-primary text-primary-foreground hover:bg-[var(--purple)]'}`}
+                className={`p-2 sm:p-3 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center ${isLoading || !inputValue.trim() ? 'bg-muted/50 text-foreground/30' : 'bg-primary text-primary-foreground hover:bg-[var(--purple)]'}`}
                 disabled={isLoading || !inputValue.trim()}
+                aria-label="Send message"
               >
                 <Send className="h-5 w-5" />
               </button>

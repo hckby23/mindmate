@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, FormEvent, useRef } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Montserrat } from 'next/font/google';
 import Navbar from '@/components/Navbar';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { ArrowDown } from 'lucide-react';
 
 const montserrat = Montserrat({ 
   subsets: ['latin'],
@@ -13,9 +13,7 @@ const montserrat = Montserrat({
 
 export default function MainPage() {
   const [inputValue, setInputValue] = useState('');
-  const [currentSection, setCurrentSection] = useState(0);
   const router = useRouter();
-  const sectionsRef = useRef<HTMLDivElement>(null);
   
   // Section data
   const sections = [
@@ -51,21 +49,7 @@ export default function MainPage() {
     }
   ];
   
-  // Handle scroll to next/previous section
-  const scrollToSection = (direction: 'next' | 'prev') => {
-    if (!sectionsRef.current) return;
-    
-    const newSection = direction === 'next' 
-      ? Math.min(currentSection + 1, sections.length - 1)
-      : Math.max(currentSection - 1, 0);
-    
-    setCurrentSection(newSection);
-    
-    const sectionElement = document.getElementById(sections[newSection].id);
-    if (sectionElement) {
-      sectionElement.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -83,28 +67,29 @@ export default function MainPage() {
         {/* Hero Section with Centered Logo and Search */}
         <div className="h-screen flex flex-col items-center justify-center px-4">
           <div className="flex flex-col items-center max-w-2xl w-full">
-            {/* Larger Logo */}
-            <h1 className={`text-8xl font-extrabold mb-16 tracking-tight ${montserrat.className}`}>
+            {/* Responsive Logo */}
+            <h1 className={`text-5xl md:text-6xl lg:text-8xl font-extrabold mb-8 md:mb-16 tracking-tight ${montserrat.className}`}>
               <span className="text-primary">Mind</span>
               <span className="text-[var(--purple)]">Mate</span>
             </h1>
             
             {/* Search Form */}
-            <form onSubmit={handleSubmit} className="w-full mb-16">
+            <form onSubmit={handleSubmit} className="w-full mb-8 md:mb-16 px-4 sm:px-0">
               <div className="relative w-full">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="How are you feeling today?"
-                  className="w-full p-5 pr-12 rounded-lg bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary text-lg"
+                  className="w-full p-3 sm:p-4 md:p-5 pr-12 rounded-lg bg-muted/30 border border-border focus:outline-none focus:ring-2 focus:ring-primary text-base md:text-lg"
                 />
                 <button 
                   type="submit" 
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-primary hover:text-[var(--purple)]"
                   disabled={!inputValue.trim()}
+                  aria-label="Submit"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7">
                     <path d="M22 2L11 13"/>
                     <path d="M22 2l-7 20-4-9-9-4 20-7z"/>
                   </svg>
@@ -114,7 +99,12 @@ export default function MainPage() {
             
             {/* Scroll Down Indicator */}
             <button 
-              onClick={() => scrollToSection('next')} 
+              onClick={() => {
+                const firstSection = document.getElementById(sections[0].id);
+                if (firstSection) {
+                  firstSection.scrollIntoView({ behavior: 'smooth' });
+                }
+              }} 
               className="animate-bounce text-primary hover:text-[var(--purple)] transition-colors"
               aria-label="Scroll down"
             >
@@ -124,40 +114,20 @@ export default function MainPage() {
         </div>
         
         {/* Scrollable Detailed Pages */}
-        <div ref={sectionsRef} className="relative">
+        <div className="relative">
           {sections.map((section, index) => (
             <section 
               key={section.id} 
               id={section.id}
-              className="min-h-screen flex flex-col items-center justify-center p-8 relative"
+              className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 relative"
             >
-              <div className="max-w-3xl w-full bg-muted/10 border border-border rounded-xl p-10 backdrop-blur-sm">
-                <h2 className={`text-4xl font-bold mb-6 ${montserrat.className} text-primary`}>{section.title}</h2>
-                <p className="text-xl mb-6 font-medium">{section.content}</p>
-                <p className="text-lg leading-relaxed">{section.details}</p>
+              <div className="max-w-3xl w-full bg-muted/10 border border-border rounded-xl p-5 sm:p-8 md:p-10 backdrop-blur-sm">
+                <h2 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 ${montserrat.className} text-primary`}>{section.title}</h2>
+                <p className="text-lg sm:text-xl mb-4 md:mb-6 font-medium">{section.content}</p>
+                <p className="text-base sm:text-lg leading-relaxed">{section.details}</p>
               </div>
               
-              {/* Navigation Controls */}
-              <div className="absolute bottom-10 right-10 flex gap-4">
-                {index > 0 && (
-                  <button 
-                    onClick={() => scrollToSection('prev')} 
-                    className="p-3 rounded-full bg-muted/30 text-primary hover:text-[var(--purple)] hover:bg-muted/50 transition-colors"
-                    aria-label="Previous section"
-                  >
-                    <ArrowUp size={24} />
-                  </button>
-                )}
-                {index < sections.length - 1 && (
-                  <button 
-                    onClick={() => scrollToSection('next')} 
-                    className="p-3 rounded-full bg-muted/30 text-primary hover:text-[var(--purple)] hover:bg-muted/50 transition-colors"
-                    aria-label="Next section"
-                  >
-                    <ArrowDown size={24} />
-                  </button>
-                )}
-              </div>
+
             </section>
           ))}
         </div>
